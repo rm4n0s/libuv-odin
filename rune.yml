@@ -1,0 +1,22 @@
+version: 0
+platforms:
+  - Linux x86_64
+from:
+  language: c
+  static: "libuv/build/libuv.a"
+  headers: 
+     - "libuv/include/uv.h"
+  includedirs:
+    - "libuv/include/uv"
+    - "/usr/include/sys"
+to:
+  language: odin
+  package: uv
+  trim_prefix:
+    functions: uv_
+    types: Uv_
+    constants: UV_
+  no_build_tag: yes
+  use_when_else: yes
+  ignore_arch: yes
+  out: "uv/uv.odin"
