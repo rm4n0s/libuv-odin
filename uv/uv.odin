@@ -5,7 +5,7 @@ import "core:c"
 
 ssize_t :: c.ssize_t
 
-EXTERN :: `__attribute__((visibility(\"default\")))`
+// EXTERN :: `__attribute__((visibility(\"default\")))`
 
 uv__queue :: struct {
 	next: ^uv__queue,
@@ -993,42 +993,51 @@ timer_heap_struct_anon_24 :: struct {
 	min:   rawptr,
 	nelts: u32,
 }
-uv_mutex_t :: i32
-uv_rwlock_t :: i32
+uv_mutex_t :: struct #raw_union {
+	__size:  [40]c.char,
+	__align: c.long,
+}
+uv_rwlock_t :: struct #raw_union {
+	__size:  [56]c.char,
+	__align: c.long,
+}
 uv_loop_s :: struct {
-	data:              rawptr,
-	active_handles:    u32,
-	handle_queue:      uv__queue,
-	active_reqs:       active_reqs_union_anon_22,
-	internal_fields:   rawptr,
-	stop_flag:         u32,
-	flags:             u64,
-	backend_fd:        i32,
-	pending_queue:     uv__queue,
-	watcher_queue:     uv__queue,
-	watchers:          ^[^]uv__io_t,
-	nwatchers:         u32,
-	nfds:              u32,
-	wq:                uv__queue,
-	wq_mutex:          uv_mutex_t,
-	wq_async:          uv_async_t,
-	cloexec_lock:      uv_rwlock_t,
-	closing_handles:   [^]uv_handle_t,
-	process_handles:   uv__queue,
-	prepare_handles:   uv__queue,
-	check_handles:     uv__queue,
-	idle_handles:      uv__queue,
-	async_handles:     uv__queue,
-	async_unused:      async_unused_func_ptr_anon_23,
-	async_io_watcher:  uv__io_t,
-	async_wfd:         i32,
-	timer_heap:        timer_heap_struct_anon_24,
-	timer_counter:     i32,
-	time:              i32,
-	signal_pipefd:     [2]i32,
-	signal_io_watcher: uv__io_t,
-	child_watcher:     uv_signal_t,
-	emfile_fd:         i32,
+	data:                 rawptr,
+	active_handles:       u32,
+	handle_queue:         uv__queue,
+	active_reqs:          active_reqs_union_anon_22,
+	internal_fields:      rawptr,
+	stop_flag:            u32,
+	flags:                u64,
+	backend_fd:           i32,
+	pending_queue:        uv__queue,
+	watcher_queue:        uv__queue,
+	watchers:             ^[^]uv__io_t,
+	nwatchers:            u32,
+	nfds:                 u32,
+	wq:                   uv__queue,
+	wq_mutex:             uv_mutex_t,
+	wq_async:             uv_async_t,
+	cloexec_lock:         uv_rwlock_t,
+	closing_handles:      [^]uv_handle_t,
+	process_handles:      uv__queue,
+	prepare_handles:      uv__queue,
+	check_handles:        uv__queue,
+	idle_handles:         uv__queue,
+	async_handles:        uv__queue,
+	async_unused:         async_unused_func_ptr_anon_23,
+	async_io_watcher:     uv__io_t,
+	async_wfd:            i32,
+	timer_heap:           timer_heap_struct_anon_24,
+	timer_counter:        i32,
+	time:                 i32,
+	signal_pipefd:        [2]i32,
+	signal_io_watcher:    uv__io_t,
+	child_watcher:        uv_signal_t,
+	emfile_fd:            i32,
+	inotify_read_watcher: uv__io_t,
+	inotify_watchers:     rawptr,
+	inotify_fd:           i32,
 }
 uv_os_fd_t :: i32
 uv_os_sock_t :: i32
@@ -1053,7 +1062,7 @@ uv_barrier_t :: struct {
 uv_once_t :: i32
 uv_key_t :: i32
 
-foreign import uv_runic "../libuv/build/libuv.a"
+foreign import uv_runic "system:libuv.a"
 
 @(default_calling_convention = "c")
 foreign uv_runic {
