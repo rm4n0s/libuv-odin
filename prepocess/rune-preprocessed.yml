@@ -1,0 +1,20 @@
+version: 0
+platforms:
+  - Linux x86_64
+from:
+  language: c
+  static: "libuv.a"
+  headers: 
+     - "uv-preprocessed.h"
+
+to:
+  language: odin
+  package: uv
+  trim_prefix:
+    functions: uv_
+    types: Uv_
+    constants: UV_
+  no_build_tag: yes
+  use_when_else: yes
+  ignore_arch: yes
+  out: "uv-preprocessed/uv.odin"

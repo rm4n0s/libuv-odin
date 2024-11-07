@@ -1,11 +1,6 @@
 package uv
 
-
-import "core:c"
-
-ssize_t :: c.ssize_t
-
-// EXTERN :: `__attribute__((visibility(\"default\")))`
+EXTERN :: `__attribute__((visibility(\"default\")))`
 
 uv__queue :: struct {
 	next: ^uv__queue,
@@ -96,7 +91,6 @@ uv_errno_t :: enum i32 {
 	ESOCKTNOSUPPORT = -4025,
 	ENODATA         = -4024,
 	EUNATCH         = -4023,
-	ENOEXEC         = -4022,
 	ERRNO_MAX       = -4096,
 }
 uv_handle_type :: enum u32 {
@@ -182,7 +176,6 @@ uv_buf_t :: struct {
 	len:  u64,
 }
 uv_alloc_cb :: #type proc "c" (handle: ^uv_handle_t, suggested_size: u64, buf: ^uv_buf_t)
-uv_read_cb :: #type proc "c" (stream: ^uv_stream_t, nread: ssize_t, buf: ^uv_buf_t)
 uv__io_cb :: ^^^rawptr
 uv__io_s :: struct {
 	cb:            uv__io_cb,
@@ -363,9 +356,9 @@ uv_timer_s :: struct {
 	flags:        u32,
 	timer_cb:     uv_timer_cb,
 	node:         node_union_anon_12,
-	timeout:      i32,
-	repeat:       i32,
-	start_id:     i32,
+	timeout:      u64,
+	repeat:       u64,
+	start_id:     u64,
 }
 uv_timer_t :: uv_timer_s
 u_union_anon_7 :: struct #raw_union {
@@ -657,17 +650,6 @@ uv_file :: i32
 uv_uid_t :: i32
 uv_gid_t :: i32
 uv_fs_t :: uv_fs_s
-
-uv_fs_s :: struct {
-	fs_type: uv_fs_type,
-	loop:    ^uv_loop_t,
-	cb:      uv_fs_cb,
-	result:  ssize_t,
-	ptr:     rawptr,
-	path:    cstring,
-	statbuf: uv_stat_t,
-}
-
 uv_work_s :: struct {
 	data:          rawptr,
 	type:          uv_req_type,
@@ -755,7 +737,7 @@ uv_statfs_s :: struct {
 	f_bavail: u64,
 	f_files:  u64,
 	f_ffree:  u64,
-	f_spare:  [4]i32,
+	f_spare:  [4]u64,
 }
 uv_statfs_t :: uv_statfs_s
 uv_metrics_s :: struct {
@@ -848,10 +830,7 @@ uv_udp_flags :: enum u32 {
 	UDP_REUSEPORT     = 64,
 	UDP_RECVMMSG      = 256,
 }
-
 uv_udp_send_cb :: #type proc "c" (req: ^uv_udp_send_t, status: i32)
-uv_udp_recv_cb :: #type proc "c" (handle: ^uv_udp_t, nread: ssize_t, addr: ^sockaddr, flags: u32)
-
 sockaddr :: ^^^rawptr
 uv_tty_mode_t :: enum u32 {
 	TTY_MODE_NORMAL = 0,
@@ -993,52 +972,48 @@ timer_heap_struct_anon_24 :: struct {
 	min:   rawptr,
 	nelts: u32,
 }
-uv_mutex_t :: struct #raw_union {
-	__size:  [40]c.char,
-	__align: c.long,
-}
-uv_rwlock_t :: struct #raw_union {
-	__size:  [56]c.char,
-	__align: c.long,
-}
+uv_mutex_t :: i32
+uv_rwlock_t :: i32
 uv_loop_s :: struct {
-	data:                 rawptr,
-	active_handles:       u32,
-	handle_queue:         uv__queue,
-	active_reqs:          active_reqs_union_anon_22,
-	internal_fields:      rawptr,
-	stop_flag:            u32,
-	flags:                u64,
-	backend_fd:           i32,
-	pending_queue:        uv__queue,
-	watcher_queue:        uv__queue,
-	watchers:             ^[^]uv__io_t,
-	nwatchers:            u32,
-	nfds:                 u32,
-	wq:                   uv__queue,
-	wq_mutex:             uv_mutex_t,
-	wq_async:             uv_async_t,
-	cloexec_lock:         uv_rwlock_t,
-	closing_handles:      [^]uv_handle_t,
-	process_handles:      uv__queue,
-	prepare_handles:      uv__queue,
-	check_handles:        uv__queue,
-	idle_handles:         uv__queue,
-	async_handles:        uv__queue,
-	async_unused:         async_unused_func_ptr_anon_23,
-	async_io_watcher:     uv__io_t,
-	async_wfd:            i32,
-	timer_heap:           timer_heap_struct_anon_24,
-	timer_counter:        i32,
-	time:                 i32,
-	signal_pipefd:        [2]i32,
-	signal_io_watcher:    uv__io_t,
-	child_watcher:        uv_signal_t,
-	emfile_fd:            i32,
-	inotify_read_watcher: uv__io_t,
-	inotify_watchers:     rawptr,
-	inotify_fd:           i32,
+	data:              rawptr,
+	active_handles:    u32,
+	handle_queue:      uv__queue,
+	active_reqs:       active_reqs_union_anon_22,
+	internal_fields:   rawptr,
+	stop_flag:         u32,
+	flags:             u64,
+	backend_fd:        i32,
+	pending_queue:     uv__queue,
+	watcher_queue:     uv__queue,
+	watchers:          ^[^]uv__io_t,
+	nwatchers:         u32,
+	nfds:              u32,
+	wq:                uv__queue,
+	wq_mutex:          uv_mutex_t,
+	wq_async:          uv_async_t,
+	cloexec_lock:      uv_rwlock_t,
+	closing_handles:   [^]uv_handle_t,
+	process_handles:   uv__queue,
+	prepare_handles:   uv__queue,
+	check_handles:     uv__queue,
+	idle_handles:      uv__queue,
+	async_handles:     uv__queue,
+	async_unused:      async_unused_func_ptr_anon_23,
+	async_io_watcher:  uv__io_t,
+	async_wfd:         i32,
+	timer_heap:        timer_heap_struct_anon_24,
+	timer_counter:     u64,
+	time:              u64,
+	signal_pipefd:     [2]i32,
+	signal_io_watcher: uv__io_t,
+	child_watcher:     uv_signal_t,
+	emfile_fd:         i32,
 }
+_IO_marker :: ^^^rawptr
+_IO_lock_t :: ^^^rawptr
+_IO_codecvt :: ^^^rawptr
+_IO_wide_data :: ^^^rawptr
+FILE :: _IO_FILE
 uv_os_fd_t :: i32
 uv_os_sock_t :: i32
 uv_pid_t :: i32
@@ -1124,7 +1099,7 @@ foreign uv_runic {
 	update_time :: proc(param0: ^uv_loop_t) ---
 
 	@(link_name = "uv_now")
-	now :: proc(param0: ^uv_loop_t) -> i32 ---
+	now :: proc(param0: ^uv_loop_t) -> u64 ---
 
 	@(link_name = "uv_backend_fd")
 	backend_fd :: proc(param0: ^uv_loop_t) -> i32 ---
@@ -1190,10 +1165,10 @@ foreign uv_runic {
 	walk :: proc(loop: ^uv_loop_t, walk_cb: uv_walk_cb, arg: rawptr) ---
 
 	@(link_name = "uv_print_all_handles")
-	print_all_handles :: proc(loop: ^uv_loop_t, stream: rawptr) ---
+	print_all_handles :: proc(loop: ^uv_loop_t, stream: ^FILE) ---
 
 	@(link_name = "uv_print_active_handles")
-	print_active_handles :: proc(loop: ^uv_loop_t, stream: rawptr) ---
+	print_active_handles :: proc(loop: ^uv_loop_t, stream: ^FILE) ---
 
 	@(link_name = "uv_close")
 	close :: proc(handle: ^uv_handle_t, close_cb: uv_close_cb) ---
@@ -1469,10 +1444,10 @@ foreign uv_runic {
 	timer_set_repeat :: proc(handle: ^uv_timer_t, repeat: u64) ---
 
 	@(link_name = "uv_timer_get_repeat")
-	timer_get_repeat :: proc(handle: ^uv_timer_t) -> i32 ---
+	timer_get_repeat :: proc(handle: ^uv_timer_t) -> u64 ---
 
 	@(link_name = "uv_timer_get_due_in")
-	timer_get_due_in :: proc(handle: ^uv_timer_t) -> i32 ---
+	timer_get_due_in :: proc(handle: ^uv_timer_t) -> u64 ---
 
 	@(link_name = "uv_getaddrinfo")
 	getaddrinfo :: proc(loop: ^uv_loop_t, req: ^uv_getaddrinfo_t, getaddrinfo_cb: uv_getaddrinfo_cb, node: cstring, service: cstring, hints: [^]addrinfo) -> i32 ---
@@ -1607,7 +1582,7 @@ foreign uv_runic {
 	metrics_info :: proc(loop: ^uv_loop_t, metrics: [^]uv_metrics_t) -> i32 ---
 
 	@(link_name = "uv_metrics_idle_time")
-	metrics_idle_time :: proc(loop: ^uv_loop_t) -> i32 ---
+	metrics_idle_time :: proc(loop: ^uv_loop_t) -> u64 ---
 
 	@(link_name = "uv_fs_get_type")
 	fs_get_type :: proc(param0: ^uv_fs_t) -> uv_fs_type ---
@@ -1820,22 +1795,22 @@ foreign uv_runic {
 	chdir :: proc(dir: cstring) -> i32 ---
 
 	@(link_name = "uv_get_free_memory")
-	get_free_memory :: proc() -> i32 ---
+	get_free_memory :: proc() -> u64 ---
 
 	@(link_name = "uv_get_total_memory")
-	get_total_memory :: proc() -> i32 ---
+	get_total_memory :: proc() -> u64 ---
 
 	@(link_name = "uv_get_constrained_memory")
-	get_constrained_memory :: proc() -> i32 ---
+	get_constrained_memory :: proc() -> u64 ---
 
 	@(link_name = "uv_get_available_memory")
-	get_available_memory :: proc() -> i32 ---
+	get_available_memory :: proc() -> u64 ---
 
 	@(link_name = "uv_clock_gettime")
 	clock_gettime :: proc(clock_id: uv_clock_id, ts: [^]uv_timespec64_t) -> i32 ---
 
 	@(link_name = "uv_hrtime")
-	hrtime :: proc() -> i32 ---
+	hrtime :: proc() -> u64 ---
 
 	@(link_name = "uv_sleep")
 	sleep :: proc(msec: u32) ---
