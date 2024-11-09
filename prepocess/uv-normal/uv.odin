@@ -45,15 +45,6 @@ buf_t :: struct {
     len: u64,
 }
 alloc_cb :: #type proc "c" (handle: ^handle_t, suggested_size: u64, buf: ^buf_t)
-io_cb :: rawptr
-io_s :: struct {
-    cb: io_cb,
-    pending_queue: queue,
-    watcher_queue: queue,
-    pevents: u32,
-    events: u32,
-    fd: i32,
-}
 io_t :: io_s
 stream_s :: struct {
     data: rawptr,
@@ -727,6 +718,15 @@ barrier_t :: struct {
     b: ^_uv_barrier,
 }
 key_t :: posix.pthread_key_t
+io_s :: struct {
+    cb: io_cb,
+    pending_queue: queue,
+    watcher_queue: queue,
+    pevents: u32,
+    events: u32,
+    fd: i32,
+}
+io_cb :: #type proc "c" (loop: ^loop_s, w: ^io_s, events: u32)
 
 when #config(UV_STATIC, false) {
     foreign import uv_runic "system:libuv.a"
