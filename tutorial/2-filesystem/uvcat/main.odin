@@ -8,19 +8,19 @@ import "core:os"
 import "core:strings"
 
 
-open_req: uv.uv_fs_t
-read_req: uv.uv_fs_t
-write_req: uv.uv_fs_t
+open_req: uv.fs_t
+read_req: uv.fs_t
+write_req: uv.fs_t
 
-iov: uv.uv_buf_t
+iov: uv.buf_t
 buffer: [1024]c.char
 
-on_read :: proc "c" (req: ^uv.uv_fs_t) {
+on_read :: proc "c" (req: ^uv.fs_t) {
 	context = runtime.default_context()
 	if req.result < 0 {
 		fmt.println("Error read error: ", uv.strerror(cast(i32)req.result))
 	} else if (req.result == 0) {
-		close_req: uv.uv_fs_t
+		close_req: uv.fs_t
 		uv.fs_close(uv.default_loop(), &close_req, cast(i32)open_req.result, nil)
 	} else if (req.result > 0) {
 		iov.len = cast(u64)req.result
@@ -28,7 +28,7 @@ on_read :: proc "c" (req: ^uv.uv_fs_t) {
 	}
 }
 
-on_write :: proc "c" (req: ^uv.uv_fs_t) {
+on_write :: proc "c" (req: ^uv.fs_t) {
 	context = runtime.default_context()
 	if req.result < 0 {
 		fmt.println("Error write error: ", uv.strerror(cast(i32)req.result))
@@ -37,7 +37,7 @@ on_write :: proc "c" (req: ^uv.uv_fs_t) {
 	}
 }
 
-on_open :: proc "c" (req: ^uv.uv_fs_t) {
+on_open :: proc "c" (req: ^uv.fs_t) {
 	context = runtime.default_context()
 	assert(req == &open_req)
 	if req.result >= 0 {

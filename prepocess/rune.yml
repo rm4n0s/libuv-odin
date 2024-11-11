@@ -4,18 +4,45 @@ platforms:
 from:
   language: c
   static: "libuv.a"
+  shared: "libuv.so"
   headers: 
-     - "/usr/include/uv.h"
+     - "src/uv.h"
   includedirs:
-    - "/usr/include/uv"
+    - "src"
+  defines:
+    UV_EXTERN: "extern"
+    ssize_t: "signed long"
+  extern:
+    - "src/stdio.h"
+    - "src/sys/*"
+    - "src/pthread.h"
+    - "src/dirent.h"
+    - "src/fcntl.h"
+  overwrite:
+    types:
+      "uv_sem_t": "#UInt8 #Attr Arr 32 #AttrEnd"
+  ignore:
+    types:
+      - "sem_t"
+      - "uv_once_t"
 to:
   language: odin
   package: uv
   trim_prefix:
-    functions: uv_
-    types: Uv_
-    constants: UV_
+    - uv__
+    - uv_
+    - UV_
   no_build_tag: yes
-  use_when_else: yes
-  ignore_arch: yes
   out: "uv-normal/uv.odin"
+  extern:
+    sources:
+      "src/stdio.h": "core:c/libc"
+      "src/sys/types.h": "core:sys/linux"
+      "src/sys/socket.h": "core:sys/posix"
+      "src/pthread.h": "core:sys/posix"
+      "src/dirent.h": "core:sys/posix"
+    remaps:
+      "pid_t": "Pid"
+      "gid_t": "Gid"
+      "uid_t": "Uid"
+
