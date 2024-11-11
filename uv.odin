@@ -942,7 +942,7 @@ uv__io_s :: struct {
 uv__io_cb :: #type proc "c" (loop: ^uv_loop_s, w: ^uv__io_s, events: u32)
 uv__io_t :: uv__io_s
 uv_buf_t :: struct {
-	base: cstring,
+	base: [^]byte,
 	len:  u64,
 }
 uv_file :: i32
@@ -2016,13 +2016,13 @@ foreign uv_runic {
 	strerror :: proc(err: i32) -> cstring ---
 
 	@(link_name = "uv_strerror_r")
-	strerror_r :: proc(err: i32, buf: cstring, buflen: u64) -> cstring ---
+	strerror_r :: proc(err: i32, buf: [^]byte, buflen: u64) -> cstring ---
 
 	@(link_name = "uv_err_name")
 	err_name :: proc(err: i32) -> cstring ---
 
 	@(link_name = "uv_err_name_r")
-	err_name_r :: proc(err: i32, buf: cstring, buflen: u64) -> cstring ---
+	err_name_r :: proc(err: i32, buf: [^]byte, buflen: u64) -> cstring ---
 
 	@(link_name = "uv_shutdown")
 	shutdown :: proc(req: ^uv_shutdown_t, handle: ^uv_stream_t, cb: uv_shutdown_cb) -> i32 ---
@@ -2085,7 +2085,7 @@ foreign uv_runic {
 	fileno :: proc(handle: ^uv_handle_t, fd: ^uv_os_fd_t) -> i32 ---
 
 	@(link_name = "uv_buf_init")
-	buf_init :: proc(base: cstring, len: u32) -> uv_buf_t ---
+	buf_init :: proc(base: [^]byte, len: u32) -> uv_buf_t ---
 
 	@(link_name = "uv_pipe")
 	pipe :: proc(fds: [2]uv_file, read_flags: i32, write_flags: i32) -> i32 ---
@@ -2268,10 +2268,10 @@ foreign uv_runic {
 	pipe_connect2 :: proc(req: ^uv_connect_t, handle: ^uv_pipe_t, name: cstring, namelen: u64, flags: u32, cb: uv_connect_cb) -> i32 ---
 
 	@(link_name = "uv_pipe_getsockname")
-	pipe_getsockname :: proc(handle: ^uv_pipe_t, buffer: cstring, size: ^u64) -> i32 ---
+	pipe_getsockname :: proc(handle: ^uv_pipe_t, buffer: [^]byte, size: ^u64) -> i32 ---
 
 	@(link_name = "uv_pipe_getpeername")
-	pipe_getpeername :: proc(handle: ^uv_pipe_t, buffer: cstring, size: ^u64) -> i32 ---
+	pipe_getpeername :: proc(handle: ^uv_pipe_t, buffer: [^]byte, size: ^u64) -> i32 ---
 
 	@(link_name = "uv_pipe_pending_instances")
 	pipe_pending_instances :: proc(handle: ^uv_pipe_t, count: i32) ---
@@ -2382,7 +2382,7 @@ foreign uv_runic {
 	setup_args :: proc(argc: i32, argv: ^cstring) -> ^cstring ---
 
 	@(link_name = "uv_get_process_title")
-	get_process_title :: proc(buffer: cstring, size: u64) -> i32 ---
+	get_process_title :: proc(buffer: [^]byte, size: u64) -> i32 ---
 
 	@(link_name = "uv_set_process_title")
 	set_process_title :: proc(title: cstring) -> i32 ---
@@ -2403,10 +2403,10 @@ foreign uv_runic {
 	getrusage :: proc(rusage: ^uv_rusage_t) -> i32 ---
 
 	@(link_name = "uv_os_homedir")
-	os_homedir :: proc(buffer: cstring, size: ^u64) -> i32 ---
+	os_homedir :: proc(buffer: [^]byte, size: ^u64) -> i32 ---
 
 	@(link_name = "uv_os_tmpdir")
-	os_tmpdir :: proc(buffer: cstring, size: ^u64) -> i32 ---
+	os_tmpdir :: proc(buffer: [^]byte, size: ^u64) -> i32 ---
 
 	@(link_name = "uv_os_get_passwd")
 	os_get_passwd :: proc(pwd: ^uv_passwd_t) -> i32 ---
@@ -2466,7 +2466,7 @@ foreign uv_runic {
 	os_free_environ :: proc(envitems: [^]uv_env_item_t, count: i32) ---
 
 	@(link_name = "uv_os_getenv")
-	os_getenv :: proc(name: cstring, buffer: cstring, size: ^u64) -> i32 ---
+	os_getenv :: proc(name: cstring, buffer: [^]byte, size: ^u64) -> i32 ---
 
 	@(link_name = "uv_os_setenv")
 	os_setenv :: proc(name: cstring, value: cstring) -> i32 ---
@@ -2475,7 +2475,7 @@ foreign uv_runic {
 	os_unsetenv :: proc(name: cstring) -> i32 ---
 
 	@(link_name = "uv_os_gethostname")
-	os_gethostname :: proc(buffer: cstring, size: ^u64) -> i32 ---
+	os_gethostname :: proc(buffer: [^]byte, size: ^u64) -> i32 ---
 
 	@(link_name = "uv_os_uname")
 	os_uname :: proc(buffer: ^uv_utsname_t) -> i32 ---
@@ -2628,7 +2628,7 @@ foreign uv_runic {
 	fs_poll_stop :: proc(handle: ^uv_fs_poll_t) -> i32 ---
 
 	@(link_name = "uv_fs_poll_getpath")
-	fs_poll_getpath :: proc(handle: ^uv_fs_poll_t, buffer: cstring, size: ^u64) -> i32 ---
+	fs_poll_getpath :: proc(handle: ^uv_fs_poll_t, buffer: [^]byte, size: ^u64) -> i32 ---
 
 	@(link_name = "uv_signal_init")
 	signal_init :: proc(loop: ^uv_loop_t, handle: ^uv_signal_t) -> i32 ---
@@ -2655,7 +2655,7 @@ foreign uv_runic {
 	fs_event_stop :: proc(handle: ^uv_fs_event_t) -> i32 ---
 
 	@(link_name = "uv_fs_event_getpath")
-	fs_event_getpath :: proc(handle: ^uv_fs_event_t, buffer: cstring, size: ^u64) -> i32 ---
+	fs_event_getpath :: proc(handle: ^uv_fs_event_t, buffer: [^]byte, size: ^u64) -> i32 ---
 
 	@(link_name = "uv_ip4_addr")
 	ip4_addr :: proc(ip: cstring, port: i32, addr: rawptr) -> i32 ---
@@ -2682,16 +2682,16 @@ foreign uv_runic {
 	random :: proc(loop: ^uv_loop_t, req: ^uv_random_t, buf: rawptr, buflen: u64, flags: u32, cb: uv_random_cb) -> i32 ---
 
 	@(link_name = "uv_if_indextoname")
-	if_indextoname :: proc(ifindex: u32, buffer: cstring, size: ^u64) -> i32 ---
+	if_indextoname :: proc(ifindex: u32, buffer: [^]byte, size: ^u64) -> i32 ---
 
 	@(link_name = "uv_if_indextoiid")
-	if_indextoiid :: proc(ifindex: u32, buffer: cstring, size: ^u64) -> i32 ---
+	if_indextoiid :: proc(ifindex: u32, buffer: [^]byte, size: ^u64) -> i32 ---
 
 	@(link_name = "uv_exepath")
-	exepath :: proc(buffer: cstring, size: ^u64) -> i32 ---
+	exepath :: proc(buffer: [^]byte, size: ^u64) -> i32 ---
 
 	@(link_name = "uv_cwd")
-	cwd :: proc(buffer: cstring, size: ^u64) -> i32 ---
+	cwd :: proc(buffer: [^]byte, size: ^u64) -> i32 ---
 
 	@(link_name = "uv_chdir")
 	chdir :: proc(dir: cstring) -> i32 ---
